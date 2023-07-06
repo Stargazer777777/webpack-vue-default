@@ -95,15 +95,8 @@ const config = (env: Record<string, boolean>): webpack.Configuration => {
         // ts/tsx
         {
           test: /\.tsx?$/,
-          use: [
-            {
-              loader: 'ts-loader',
-              options: {
-                transpileOnly: true,
-              },
-            },
-          ],
-          exclude: /node_modules/,
+          use: 'babel-loader',
+          exclude: /node_modules/, //排除 node_modules 目录
         },
         {
           test: /\.vue$/,
