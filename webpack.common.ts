@@ -8,7 +8,6 @@ import WebpackBar from 'webpackbar';
 import ESLintPlugin from 'eslint-webpack-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
 
-
 const config = (env: Record<string, boolean>): webpack.Configuration => {
   const isProd = env.production;
 
@@ -101,7 +100,6 @@ const config = (env: Record<string, boolean>): webpack.Configuration => {
               loader: 'ts-loader',
               options: {
                 transpileOnly: true,
-                appendTsSuffixTo: [/\.vue$/],
               },
             },
           ],
