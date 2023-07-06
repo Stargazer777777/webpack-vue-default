@@ -8,11 +8,22 @@ module.exports = {
       },
     ],
     //将基础的ES6语法向下转译，兼容不同的浏览器
-    ['@babel/preset-env'],
+    [
+      '@babel/preset-env',
+      {
+        useBuiltIns: 'usage',
+        corejs: '3',
+      },
+    ],
   ],
   plugins: [
     // 转译高级的ES6语法
-    ['@babel/plugin-transform-runtime'],
+    [
+      '@babel/plugin-transform-runtime',
+      {
+        regenerator: true,
+      },
+    ],
     // 支持 ts 类的写法
     '@babel/plugin-proposal-class-properties',
   ],
