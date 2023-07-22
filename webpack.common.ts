@@ -93,17 +93,6 @@ const config = (env: Record<string, boolean>): webpack.Configuration => {
           },
         },
         {
-          test: /\.jsx?$/,
-          use: 'babel-loader',
-          exclude: /node_modules/, //排除 node_modules 目录
-        },
-        // ts/tsx
-        {
-          test: /\.tsx?$/,
-          use: 'babel-loader',
-          exclude: /node_modules/, //排除 node_modules 目录
-        },
-        {
           test: /\.vue$/,
           use: ['vue-loader'],
         },
