@@ -16,15 +16,4 @@ module.exports = {
       },
     ],
   ],
-  plugins: [
-    // 转译高级的ES6语法
-    [
-      '@babel/plugin-transform-runtime',
-      {
-        regenerator: true,
-      },
-    ],
-    // 支持 ts 类的写法
-    '@babel/plugin-proposal-class-properties',
-  ],
 };
