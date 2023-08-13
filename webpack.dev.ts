@@ -21,10 +21,7 @@ export default (): DevWebpackConfig => {
       historyApiFallback: true,
       client: {
         logging: 'info',
-        overlay: {
-          errors: true,
-          warnings: false,
-        },
+        overlay: false,
         progress: true,
         reconnect: true,
       },
