@@ -17,7 +17,7 @@ export interface HttpOption {
 
 export const $http = async (
   config: AxiosRequestConfig,
-  httpOption: HttpOption
+  httpOption?: HttpOption
 ) => {
   try {
     const axiosResponse = await httpInstance<BkResponse>(config);
@@ -36,7 +36,7 @@ export const $http = async (
       } else {
         errTitle = 'Unknown';
       }
-      if (!httpOption.noAlert) {
+      if (!httpOption?.noAlert) {
         alert(`${errTitle}: ${bkResponse.msg || 'unknown'}`);
       }
       const err = new Error(bkResponse?.msg || 'Unknown');
