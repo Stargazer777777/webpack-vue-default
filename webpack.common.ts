@@ -7,9 +7,13 @@ import { VueLoaderPlugin } from 'vue-loader';
 import WebpackBar from 'webpackbar';
 import ESLintPlugin from 'eslint-webpack-plugin';
 import CopyWebpackPlugin from 'copy-webpack-plugin';
+import YAML from 'yamljs';
 
-const config = (env: Record<string, boolean>): webpack.Configuration => {
-  const isProd = env.production;
+const config = (webpackEnv: Record<string, boolean>): webpack.Configuration => {
+  const env = process.env['RUNNING_ENV'];
+  const envConfig =
+    YAML.load(path.resolve(__dirname, `./.env.${env || 'dev'}.yaml`)) || {};
+  envConfig['env'] = env;
 
   return {
     entry: './src/main.ts',
@@ -43,6 +47,9 @@ const config = (env: Record<string, boolean>): webpack.Configuration => {
             globOptions: { ignore: ['**/index.html'] }, // 复制public里面的所有内容，除了index.html
           },
         ],
+      }),
+      new webpack.DefinePlugin({
+        'import.meta.env': JSON.stringify(envConfig),
       }),
     ],
     resolve: {
