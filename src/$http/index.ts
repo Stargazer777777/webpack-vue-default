@@ -20,28 +20,34 @@ export class BkError extends Error {
   constructor(bkErrorResponse: BkErrorResponse) {
     super();
     super.name = 'BkError';
-    super.message = bkErrorResponse.msg;
+    super.message = bkErrorResponse.msg || 'Unknown error';
     super.cause = bkErrorResponse.detail;
   }
 }
 
-export class HttpTool {
-  private static httpInstance = axios.create();
+class HttpTool {
+  protected httpInstance = axios.create();
 
-  static setBaseUrl(baseUrl: string) {
+  constructor(baseUrl?: string) {
+    if (baseUrl) {
+      this.setBaseUrl(baseUrl);
+    }
+  }
+
+  setBaseUrl(baseUrl: string) {
     this.httpInstance.defaults.baseURL = baseUrl;
   }
 
-  static setAuthorization(Authorization: string) {
+  setAuthorization(Authorization: string) {
     this.httpInstance.defaults.headers.common['Authorization'] = Authorization;
   }
 
-  static removeAuthorization() {
-    this.httpInstance.defaults.headers.delete['Authorization'];
+  removeAuthorization() {
+    delete this.httpInstance.defaults.headers.common['Authorization'];
   }
 
-  private static errHandler(err: AxiosError, httpOption?: HttpOption) {
-    const statusCode = err.status;
+  protected errHandler(err: AxiosError, httpOption?: HttpOption) {
+    const statusCode = err.response?.status;
 
     let errMsg = '未知错误';
 
@@ -50,10 +56,14 @@ export class HttpTool {
     if (err.response?.data) {
       const errResponse = err.response.data as BkErrorResponse;
       bkError = new BkError(errResponse);
-      errMsg = errResponse.msg;
+      errMsg = errResponse.msg || '未知错误';
     }
 
     switch (statusCode) {
+      case 401:
+        break;
+      case 403:
+        break;
       default:
         break;
     }
@@ -64,7 +74,7 @@ export class HttpTool {
     throw bkError;
   }
 
-  static async send(
+  async send(
     config: AxiosRequestConfig,
     httpOption?: HttpOption
   ): Promise<BkResponse> {
@@ -81,4 +91,4 @@ export class HttpTool {
   }
 }
 
-HttpTool.setBaseUrl(import.meta.env['HTTP_BASE']);
+export const httpTool = new HttpTool(import.meta.env['HTTP_BASE']);
