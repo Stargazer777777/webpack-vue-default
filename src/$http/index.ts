@@ -19,7 +19,7 @@ export interface HttpOption {
 export class BkError extends Error {
   constructor(bkErrorResponse: BkErrorResponse) {
     super();
-    super.stack = 'BkError';
+    super.name = 'BkError';
     super.message = bkErrorResponse.msg;
     super.cause = bkErrorResponse.detail;
   }
