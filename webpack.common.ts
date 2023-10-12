@@ -27,6 +27,7 @@ const config = (webpackEnv: Record<string, boolean>): webpack.Configuration => {
       // 生成html
       new HtmlWebpackPlugin({
         template: './public/index.html',
+        base: '/', // 让js从跟目录加载，防止history模式路由时js不从根目录加载
       }),
       new VueLoaderPlugin(), // vue-loader插件,
       new webpack.DefinePlugin({
