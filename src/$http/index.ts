@@ -1,9 +1,9 @@
 import axios, { AxiosError } from 'axios';
 import type { AxiosRequestConfig } from 'axios';
 
-export interface BkResponse {
+export interface BkResponse<DataType = any> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  data: any;
+  data: DataType;
   msg: string;
   success: boolean;
 }
@@ -17,13 +17,17 @@ export interface HttpOption {
 }
 
 export class BkError extends Error {
+  response: BkErrorResponse;
   constructor(bkErrorResponse: BkErrorResponse) {
     super();
     super.name = 'BkError';
-    super.message = bkErrorResponse.msg || 'Unknown error';
+    super.message = bkErrorResponse.msg || 'UnknownError';
     super.cause = bkErrorResponse.detail;
+    this.response = bkErrorResponse;
   }
 }
+
+type ErrorHandleFunction = () => void;
 
 class HttpTool {
   protected httpInstance = axios.create();
@@ -46,18 +50,29 @@ class HttpTool {
     delete this.httpInstance.defaults.headers.common['Authorization'];
   }
 
-  protected errHandler(err: AxiosError, httpOption?: HttpOption) {
-    const statusCode = err.response?.status;
-
-    let errMsg = '未知错误';
-
-    let bkError: BkError | undefined;
+  protected getErrorResponse(err: AxiosError): BkErrorResponse {
+    let errorResponse: BkErrorResponse = {
+      data: null,
+      detail: 'none',
+      msg: 'UnknownError',
+      success: false,
+    };
 
     if (err.response?.data) {
-      const errResponse = err.response.data as BkErrorResponse;
-      bkError = new BkError(errResponse);
-      errMsg = errResponse.msg || '未知错误';
+      errorResponse = err.response.data as BkErrorResponse;
     }
+    return errorResponse;
+  }
+
+  protected genBkError(errResponse: BkErrorResponse): BkError {
+    const bkError = new BkError(errResponse);
+    return bkError;
+  }
+
+  protected errHandler(err: AxiosError, httpOption?: HttpOption) {
+    const statusCode = err.response?.status || 555;
+    const errorResponse = this.getErrorResponse(err);
+    const bkError = this.genBkError(errorResponse);
 
     switch (statusCode) {
       case 401:
@@ -69,18 +84,18 @@ class HttpTool {
     }
 
     if (!httpOption?.noAlert) {
-      alert(errMsg);
+      alert(errorResponse.msg);
     }
     throw bkError;
   }
 
-  async send(
+  async send<DataType = any>(
     config: AxiosRequestConfig,
     httpOption?: HttpOption
   ): Promise<BkResponse> {
     try {
       const axiosResponse = await this.httpInstance<BkResponse>(config);
-      return axiosResponse.data as BkResponse;
+      return axiosResponse.data as BkResponse<DataType>;
     } catch (err) {
       if (err instanceof AxiosError) {
         throw this.errHandler(err, httpOption);
